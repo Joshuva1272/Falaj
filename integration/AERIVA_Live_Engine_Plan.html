@@ -1,0 +1,416 @@
+<title>AERIVA Live Engine Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column (880px) with full-width drawings; wireframes sit in browser frames, every block tagged with the endpoint that feeds it. */
+:root{
+  --bg:#f5f6f3; --paper:#ffffff; --ink:#18222c; --mut:#5c6873; --ln:#d6dbd8; --wire:#e8ebe8; --wire2:#d9ded9;
+  --web:#2456c8; --web2:#e3eafb; --api:#0a7d6e; --api2:#d9f0eb; --eng:#8a5a0b; --eng2:#f6ead2; --dat:#6b4bb0; --dat2:#ece6f7;
+  --warn:#b3261e; --warn2:#f9e0dd;
+  --serif:'Fraunces',Georgia,serif; --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif; --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f151b; --paper:#161f27; --ink:#e6ebef; --mut:#98a5b0; --ln:#2b3743; --wire:#1e2933; --wire2:#283542;
+  --web:#86a9ff; --web2:#1b2a4d; --api:#4fd1bd; --api2:#10302c; --eng:#f0b45a; --eng2:#3a2a10; --dat:#b9a0f0; --dat2:#2a2140;
+  --warn:#ff8a80; --warn2:#3e1916; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f151b; --paper:#161f27; --ink:#e6ebef; --mut:#98a5b0; --ln:#2b3743; --wire:#1e2933; --wire2:#283542;
+  --web:#86a9ff; --web2:#1b2a4d; --api:#4fd1bd; --api2:#10302c; --eng:#f0b45a; --eng2:#3a2a10; --dat:#b9a0f0; --dat2:#2a2140;
+  --warn:#ff8a80; --warn2:#3e1916; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15.5px/1.6 var(--sans)}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:20px;padding-block:28px 64px}
+.col{max-width:760px}
+h1{font:700 clamp(30px,4.6vw,46px)/1.08 var(--serif);margin:6px 0 12px;letter-spacing:-.01em;text-wrap:balance}
+h2{font:700 clamp(22px,3vw,28px)/1.2 var(--serif);margin:56px 0 8px;text-wrap:balance}
+h3{font:600 12px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:22px 0 8px}
+p{margin:0 0 12px}
+.kick{font:500 12px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--api)}
+.lede{font-size:18px;color:var(--mut)}
+.lede b{color:var(--ink);font-weight:600}
+code,.mono{font-family:var(--mono);font-size:.92em}
+.sec-n{font:500 12px var(--mono);color:var(--mut);display:block;margin-bottom:2px;letter-spacing:.06em}
+.card{background:var(--paper);border:1px solid var(--ln);border-radius:14px;padding:18px 20px;min-width:0}
+.scroll{overflow-x:auto}
+.diagram svg{display:block;width:100%;height:auto;min-width:720px}
+.diagram text{font-family:var(--sans)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--mut);margin-top:10px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px;border:1.5px solid}
+.cmp{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
+@media(max-width:760px){.cmp{grid-template-columns:minmax(0,1fr)}}
+.cmp .card h4{margin:0 0 6px;font:600 15px var(--sans)}
+.cmp ul{margin:0;padding-left:18px;font-size:14px}
+.pill{display:inline-block;font:500 11.5px var(--mono);padding:1px 8px;border-radius:999px;border:1px solid}
+.p-web{color:var(--web);border-color:var(--web);background:var(--web2)}
+.p-api{color:var(--api);border-color:var(--api);background:var(--api2)}
+.p-eng{color:var(--eng);border-color:var(--eng);background:var(--eng2)}
+.p-dat{color:var(--dat);border-color:var(--dat);background:var(--dat2)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:720px}
+th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--ln);vertical-align:top}
+th{font:600 11px var(--sans);letter-spacing:.07em;text-transform:uppercase;color:var(--mut)}
+td code{white-space:nowrap}
+.verb{font:600 11px var(--mono);padding:1px 6px;border-radius:5px;background:var(--api2);color:var(--api)}
+.verb.post{background:var(--eng2);color:var(--eng)}
+/* wireframes */
+.wf{margin-top:18px}
+.browser{background:var(--paper);border:1px solid var(--ln);border-radius:14px;overflow:hidden}
+.bar{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--wire);border-bottom:1px solid var(--ln);font:12px var(--mono);color:var(--mut);flex-wrap:wrap}
+.dots{display:flex;gap:5px}.dots i{width:9px;height:9px;border-radius:50%;background:var(--wire2)}
+.url{background:var(--paper);border:1px solid var(--ln);border-radius:6px;padding:2px 10px;flex:1;min-width:180px}
+.status{display:inline-flex;align-items:center;gap:6px;font:500 11.5px var(--mono);color:var(--api)}
+.status::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--api)}
+.status.off{color:var(--warn)}.status.off::before{background:var(--warn)}
+.screen{padding:14px;display:grid;gap:10px}
+.g{display:grid;gap:10px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.gl{grid-template-columns:minmax(0,1fr) minmax(0,2fr)}
+.gr{grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)}
+@media(max-width:760px){.g2,.g3,.g4,.gl,.gr{grid-template-columns:minmax(0,1fr)}}
+.blk{background:var(--wire);border:1.5px dashed var(--wire2);border-radius:10px;padding:10px 12px;min-height:58px;position:relative;min-width:0;font-size:13px}
+.blk b{display:block;font:600 13px var(--sans);margin-bottom:2px}
+.blk .s{color:var(--mut);font-size:12.5px;line-height:1.45}
+.blk.tall{min-height:200px}.blk.mid{min-height:120px}
+.blk .ep{display:inline-block;margin-top:6px}
+.blk.in{background:var(--web2);border-color:var(--web)}
+.blk.live{border-style:solid;border-color:var(--api)}
+.sk{height:8px;border-radius:4px;background:var(--wire2);margin:6px 0}
+.sk.w60{width:60%}.sk.w40{width:40%}.sk.w80{width:80%}
+.circle{aspect-ratio:1;max-width:220px;margin:8px auto 0;border-radius:50%;border:1.5px dashed var(--wire2);background:radial-gradient(circle,var(--paper) 0 18%,transparent 19% 38%,var(--paper) 39% 40%,transparent 41% 62%,var(--paper) 63% 64%,transparent 65%)}
+.note{font-size:13px;color:var(--mut);margin-top:8px}
+.states{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+@media(max-width:760px){.states{grid-template-columns:minmax(0,1fr)}}
+.st{border-radius:10px;padding:10px 12px;font-size:13px;border:1px solid var(--ln);background:var(--paper)}
+.st b{display:block;font-size:13px;margin-bottom:2px}
+.st.ok{border-color:var(--api)}.st.load{border-color:var(--web)}.st.bad{border-color:var(--warn);background:var(--warn2)}
+pre{background:var(--paper);border:1px solid var(--ln);border-radius:12px;padding:14px 16px;overflow-x:auto;font:12.5px/1.55 var(--mono);margin:0}
+.k{color:var(--web)}.str{color:var(--api)}.n{color:var(--eng)}.c{color:var(--mut)}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media(max-width:760px){.two{grid-template-columns:minmax(0,1fr)}}
+ol.steps{padding-left:22px;margin:8px 0 0}
+ol.steps li{margin-bottom:8px}
+.tree{font:13px/1.6 var(--mono);white-space:pre;overflow-x:auto}
+.tree .d{color:var(--mut)}
+.q{border-left:3px solid var(--eng);padding:8px 14px;background:var(--paper);border-radius:0 10px 10px 0;margin:10px 0;font-size:14.5px}
+a{color:var(--web)}
+</style>
+
+<div class="wrap">
+<div class="col">
+  <p class="kick">AERIVA · plan for discussion</p>
+  <h1>Connecting the simulator to the live engine</h1>
+  <p class="lede">A small <b>FastAPI server</b> runs on your laptop next to <code>aeriva_core</code>. It loads the DCT files once, fits the model, and answers each screen's questions over <code>http://localhost:8000</code>. The simulator page is served by that same server, so every number comes <b>straight from the engine</b> instead of from a copied export file.</p>
+  <p>Nothing here is built yet. This page shows the architecture, the endpoints mapped to your engine's real functions, a wireframe of each screen with the endpoint behind every block, and the build steps.</p>
+</div>
+
+<!-- 1 ARCHITECTURE -->
+<h2><span class="sec-n">01</span>Architecture</h2>
+<div class="col"><p>Three parts, all on your laptop. The browser only talks to the API; only the API touches the engine; only the engine reads the Excel files. The heavy work (reading 15 MB of flights, fitting, back-testing) happens once at start-up and is cached, so each click is answered in milliseconds.</p></div>
+<div class="card diagram scroll" style="margin-top:14px">
+<svg viewBox="0 0 980 470" role="img" aria-label="Browser calls the local FastAPI server, which calls aeriva_core, which reads the DCT files">
+  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--mut)"/></marker></defs>
+  <!-- browser -->
+  <rect x="16" y="40" width="250" height="400" rx="14" fill="var(--web2)" stroke="var(--web)" stroke-width="1.5"/>
+  <text x="34" y="70" font-size="15" font-weight="600" fill="var(--ink)">Browser</text>
+  <text x="34" y="90" font-size="12.5" fill="var(--mut)">localhost:8000 in Chrome</text>
+  <g font-size="13" fill="var(--ink)">
+    <rect x="34" y="110" width="214" height="44" rx="8" fill="var(--paper)" stroke="var(--web)"/><text x="46" y="137">1 Market Radar</text>
+    <rect x="34" y="164" width="214" height="44" rx="8" fill="var(--paper)" stroke="var(--web)"/><text x="46" y="191">2 Scenario Studio</text>
+    <rect x="34" y="218" width="214" height="44" rx="8" fill="var(--paper)" stroke="var(--web)"/><text x="46" y="245">3 Decision Card</text>
+    <rect x="34" y="272" width="214" height="44" rx="8" fill="var(--paper)" stroke="var(--web)"/><text x="46" y="299">4 Evidence Lab</text>
+  </g>
+  <rect x="34" y="336" width="214" height="84" rx="8" fill="none" stroke="var(--web)" stroke-dasharray="4 4"/>
+  <text x="46" y="358" font-size="12.5" font-weight="600" fill="var(--ink)">api.js (new, ~150 lines)</text>
+  <text x="46" y="377" font-size="12" fill="var(--mut)">fetch + debounce + loading,</text>
+  <text x="46" y="394" font-size="12" fill="var(--mut)">error and offline states;</text>
+  <text x="46" y="411" font-size="12" fill="var(--mut)">snapshot JSON as fallback</text>
+  <!-- api -->
+  <rect x="356" y="40" width="270" height="400" rx="14" fill="var(--api2)" stroke="var(--api)" stroke-width="1.5"/>
+  <text x="374" y="70" font-size="15" font-weight="600" fill="var(--ink)">aeriva_api (FastAPI)</text>
+  <text x="374" y="90" font-size="12.5" fill="var(--mut)">uvicorn, port 8000</text>
+  <g font-size="12.5" fill="var(--ink)" font-family="var(--mono)">
+    <rect x="374" y="110" width="234" height="196" rx="8" fill="var(--paper)" stroke="var(--api)"/>
+    <text x="388" y="134">GET  /api/meta</text>
+    <text x="388" y="156">GET  /api/radar</text>
+    <text x="388" y="178">GET  /api/market/{m}/series</text>
+    <text x="388" y="200">POST /api/scenario</text>
+    <text x="388" y="222">POST /api/card</text>
+    <text x="388" y="244">GET  /api/evidence</text>
+    <text x="388" y="266">GET  /api/replay/{m}</text>
+    <text x="388" y="288">POST /api/admin/refit</text>
+  </g>
+  <rect x="374" y="320" width="234" height="100" rx="8" fill="none" stroke="var(--api)" stroke-dasharray="4 4"/>
+  <text x="388" y="342" font-size="12.5" font-weight="600" fill="var(--ink)">Engine state (in memory)</text>
+  <text x="388" y="361" font-size="12" fill="var(--mut)">panel, fitted L2, back-test,</text>
+  <text x="388" y="378" font-size="12" fill="var(--mut)">grades, nowcast; saved to</text>
+  <text x="388" y="395" font-size="12" fill="var(--mut)">cache/ so restarts take seconds;</text>
+  <text x="388" y="412" font-size="12" fill="var(--mut)">tagged with a data version</text>
+  <!-- engine -->
+  <rect x="716" y="40" width="248" height="260" rx="14" fill="var(--eng2)" stroke="var(--eng)" stroke-width="1.5"/>
+  <text x="734" y="70" font-size="15" font-weight="600" fill="var(--ink)">aeriva_core (existing)</text>
+  <text x="734" y="90" font-size="12.5" fill="var(--mut)">unchanged Python package</text>
+  <g font-size="12.5" fill="var(--ink)" font-family="var(--mono)">
+    <text x="734" y="118">data.py      load files</text>
+    <text x="734" y="140">features.py  build_panel</text>
+    <text x="734" y="162">models.py    L0 L1 LG L2</text>
+    <text x="734" y="184">scenario.py  6 levers</text>
+    <text x="734" y="206">backtest.py  WAPE, ranges</text>
+    <text x="734" y="228">nowcast.py   StockFlow</text>
+    <text x="734" y="250">replay.py    2023 replays</text>
+    <text x="734" y="272">evidence.py  β by year, placebo</text>
+  </g>
+  <!-- data -->
+  <rect x="716" y="324" width="248" height="116" rx="14" fill="var(--dat2)" stroke="var(--dat)" stroke-width="1.5"/>
+  <text x="734" y="352" font-size="15" font-weight="600" fill="var(--ink)">data/ (DCT files)</text>
+  <text x="734" y="374" font-size="12" fill="var(--ink)" font-family="var(--mono)">flight_data.xlsx  15.8 MB</text>
+  <text x="734" y="394" font-size="12" fill="var(--ink)" font-family="var(--mono)">international_train/test</text>
+  <text x="734" y="414" font-size="12" fill="var(--ink)" font-family="var(--mono)">domestic_train/test</text>
+  <!-- arrows -->
+  <g stroke="var(--mut)" stroke-width="1.4" fill="none">
+    <path d="M266 190H354" marker-end="url(#ar)"/><path d="M354 214H268" marker-end="url(#ar)"/>
+    <path d="M626 170H714" marker-end="url(#ar)"/><path d="M714 194H628" marker-end="url(#ar)"/>
+    <path d="M840 322V302" marker-end="url(#ar)"/>
+  </g>
+  <text x="310" y="180" font-size="11.5" fill="var(--mut)" text-anchor="middle">JSON request</text>
+  <text x="310" y="232" font-size="11.5" fill="var(--mut)" text-anchor="middle">JSON result</text>
+  <text x="670" y="160" font-size="11.5" fill="var(--mut)" text-anchor="middle">function call</text>
+  <text x="670" y="212" font-size="11.5" fill="var(--mut)" text-anchor="middle">DataFrame</text>
+  <text x="852" y="316" font-size="11.5" fill="var(--mut)">read once</text>
+  <text x="16" y="24" font-size="13" fill="var(--mut)">Your laptop · nothing leaves the machine</text>
+</svg>
+<div class="legend"><span><i style="border-color:var(--web);background:var(--web2)"></i>Browser (simulator HTML)</span><span><i style="border-color:var(--api);background:var(--api2)"></i>New: API server</span><span><i style="border-color:var(--eng);background:var(--eng2)"></i>Existing engine</span><span><i style="border-color:var(--dat);background:var(--dat2)"></i>DCT data</span></div>
+</div>
+
+<div class="cmp">
+  <div class="card"><h4>Today: snapshot <span class="pill p-dat">static</span></h4><ul><li>Engine runs once; results copied into <code>aeriva_sim_data.json</code> inside the page.</li><li>The page repeats the formulas in JavaScript.</li><li>About 10 figures are typed in by hand.</li><li>New data means re-export and rebuild.</li><li>Works anywhere, including the claude.ai link.</li></ul></div>
+  <div class="card"><h4>Planned: live engine <span class="pill p-api">local API</span></h4><ul><li>The engine answers every request; the page only draws.</li><li>One source of truth: Python, not a JavaScript copy.</li><li>No typed figures: all come from <code>/api/meta</code> and <code>/api/evidence</code>.</li><li>New data: drop files, click Refit.</li><li>Runs at <code>localhost:8000</code> while the server is on.</li></ul></div>
+</div>
+<div class="col"><p class="note">The published claude.ai link cannot call your laptop (its security rules block requests to other addresses), so it stays the offline snapshot. The live version opens at <code>http://localhost:8000</code>. When it is hosted later, the same page points at the hosted address instead.</p></div>
+
+<!-- 2 ENDPOINTS -->
+<h2><span class="sec-n">02</span>Endpoints mapped to the engine</h2>
+<div class="col"><p>Eight endpoints cover all four screens. Each one is a thin wrapper: it checks the inputs, calls functions that already exist in <code>aeriva_core</code>, and returns JSON. The right-hand columns show where each result appears.</p></div>
+<div class="card scroll" style="margin-top:12px;padding:6px 10px">
+<table>
+<tr><th>Endpoint</th><th>Inputs</th><th>Engine functions called</th><th>Returns</th><th>Shown on</th></tr>
+<tr><td><span class="verb">GET</span> <code>/api/meta</code></td><td>none</td><td><code>L2.fit</code> coefficients, <code>config</code>, <code>integrity_report</code></td><td>months, 33 markets, α β γ δ with CIs, data versions and dates, calendar</td><td>All screens: dropdowns, header status, limits</td></tr>
+<tr><td><span class="verb">GET</span> <code>/api/radar</code></td><td>month, grade, gateway</td><td><code>scenario.future_row</code>, <code>L2.predict</code>, <code>backtest.prediction_interval</code>, <code>yield_per_1000_seats</code></td><td>per market: forecast, 80% range, YoY, yield, load factor, grade, region</td><td>1 Radar, KPIs, list, selected panel</td></tr>
+<tr><td><span class="verb">GET</span> <code>/api/market/{m}/series</code></td><td>market</td><td><code>build_panel</code>, <code>nowcast.StockFlow</code>, <code>L2.predict</code></td><td>history Jan 2023–, nowcast months, forecast + band to Aug 2026</td><td>2 Studio chart</td></tr>
+<tr><td><span class="verb post">POST</span> <code>/api/scenario</code></td><td>market, month, lever + values, occupancy</td><td><code>seats_change</code>, <code>frequency_change</code>, <code>route_cut</code>, <code>stopover</code>, <code>occupancy_change_pct/points</code></td><td>change, low–high, scenario GN, yield, occupancy, drivers, top-3 sensitivity, holidays, warnings, grade</td><td>2 Studio headline, tiles, waterfall, tornado, holidays</td></tr>
+<tr><td><span class="verb post">POST</span> <code>/api/card</code></td><td>a scenario (or slot A/B/C)</td><td>same as <code>/api/scenario</code> + <code>market_table</code> skill</td><td>the Decision Card fields; optional <code>?format=pdf</code> made on the server</td><td>3 Decision Card, export</td></tr>
+<tr><td><span class="verb">GET</span> <code>/api/evidence</code></td><td>market or total, model, h</td><td><code>rolling_backtest</code>, <code>summary</code>, <code>interval_coverage</code>, <code>bias_by_year</code>, <code>beta_by_year</code>, <code>placebo_lead</code>, <code>nowcast.validate</code></td><td>actual vs predicted, WAPE, coverage, skill, bias, β by year, placebo, nowcast error</td><td>4 Evidence Lab</td></tr>
+<tr><td><span class="verb">GET</span> <code>/api/replay/{m}</code></td><td>market, cutoff month</td><td><code>replay.replay</code></td><td>months, actual, L2, L0, seats</td><td>4 Replay chart; any market, not only Kuwait and China</td></tr>
+<tr><td><span class="verb post">POST</span> <code>/api/admin/refit</code></td><td>new Excel files (optional)</td><td><code>run_all.main</code> steps in order</td><td>job id; then status: loading, fitting, back-testing, done</td><td>Admin panel; header shows the new data version</td></tr>
+</table>
+</div>
+
+<!-- 3 WIREFRAMES -->
+<h2><span class="sec-n">03</span>Wireframes: what each screen asks for</h2>
+<div class="col"><p>Low-fidelity layouts of the four screens. Every block is tagged with the endpoint that fills it. <span class="pill p-web">blue</span> blocks are inputs; solid-outlined blocks refresh when an input changes. The header gains one new element: a status light showing whether the live engine is connected and which data version it is using.</p></div>
+
+<div class="wf">
+<h3>Header on every screen</h3>
+<div class="browser"><div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">localhost:8000</span></div>
+<div class="screen"><div class="g gr">
+  <div class="blk"><b>AERIVA · tabs 1–4</b><div class="s">unchanged</div></div>
+  <div class="blk live"><b><span class="status">Live engine · data to Jul 2025 · v2026-10-08</span></b><div class="s">Green = connected. Red = server off: the page switches to the saved snapshot and says so.</div><span class="ep pill p-api">GET /api/meta</span></div>
+</div></div></div>
+</div>
+
+<div class="wf">
+<h3>1 · Market Radar</h3>
+<div class="browser"><div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">localhost:8000/#radar</span><span class="status">live</span></div>
+<div class="screen">
+  <div class="g g4">
+    <div class="blk in"><b>Month</b><div class="s">Aug 2025 – Aug 2026</div><span class="ep pill p-api">/api/meta</span></div>
+    <div class="blk in"><b>Grade</b><div class="s">All · A · B · C</div></div>
+    <div class="blk in"><b>Gateway</b><div class="s">All · Low · Mid · High</div></div>
+    <div class="blk live"><b>KPIs</b><div class="s">total forecast · vs last year · biggest gain</div><span class="ep pill p-api">/api/radar</span></div>
+  </div>
+  <div class="g gr">
+    <div class="blk live tall"><b>Radar</b><div class="s">33 blips: distance = yield, size = forecast, colour = grade</div><div class="circle"></div><span class="ep pill p-api">GET /api/radar?month=2025-12</span></div>
+    <div class="g">
+      <div class="blk live mid"><b>Selected market</b><div class="sk w60"></div><div class="sk w80"></div><div class="sk w40"></div><div class="s">forecast + 80% range · YoY · yield · load factor</div><span class="ep pill p-api">same response, no new call</span></div>
+      <div class="blk live mid"><b>Closest to the centre</b><div class="sk"></div><div class="sk"></div><div class="sk w80"></div><span class="ep pill p-api">same response</span></div>
+    </div>
+  </div>
+</div></div>
+<p class="note">One call per month or filter change. Clicking a blip uses data already loaded, so it is instant.</p>
+</div>
+
+<div class="wf">
+<h3>2 · Scenario Studio</h3>
+<div class="browser"><div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">localhost:8000/#studio</span><span class="status">live</span></div>
+<div class="screen">
+  <div class="g gl">
+    <div class="g">
+      <div class="blk in"><b>Update box</b><div class="s">text → market, month, lever (parsed in the page, as today)</div></div>
+      <div class="blk in mid"><b>Market · Month · Lever · values · occupancy</b><div class="s">any change → wait 250 ms → one call</div><span class="ep pill p-api">POST /api/scenario</span></div>
+      <div class="blk in"><b>Save A · B · C</b><div class="s">kept in the page</div></div>
+    </div>
+    <div class="g">
+      <div class="blk live"><b>Headline: +10,108 guest nights</b><div class="s">range +7,211 to +10,108 · GREEN</div><span class="ep pill p-api">/api/scenario → delta, low, high, grade</span></div>
+      <div class="blk live mid"><b>Baseline vs scenario chart</b><div class="sk w80"></div><div class="sk"></div><div class="s">history, nowcast, forecast band, scenario dot</div><span class="ep pill p-api">GET /api/market/KUWAIT/series</span> <span class="ep pill p-api">+ scenario dot</span></div>
+    </div>
+  </div>
+  <div class="g g3">
+    <div class="blk live"><b>Baseline · Scenario · Per 1,000 seats</b><span class="ep pill p-api">/api/scenario</span></div>
+    <div class="blk live"><b>Occupancy impact</b><div class="s">Level 1 %, Level 2 points</div><span class="ep pill p-api">/api/scenario</span></div>
+    <div class="blk live"><b>Driver waterfall</b><div class="s">growth · seats · Ramadan · Eid · scenario</div><span class="ep pill p-api">/api/scenario → drivers</span></div>
+  </div>
+  <div class="g g3">
+    <div class="blk live"><b>Top-3 sensitivity</b><span class="ep pill p-api">/api/scenario → sensitivity</span></div>
+    <div class="blk"><b>Compare A · B · C</b><div class="s">one call per saved slot</div><span class="ep pill p-api">/api/scenario ×3</span></div>
+    <div class="blk live"><b>Holidays</b><div class="s">calendar strips, effects</div><span class="ep pill p-api">/api/scenario → holidays</span></div>
+  </div>
+</div></div>
+<p class="note">One request returns everything below the inputs, so the screen never shows half-updated numbers. The chart series is fetched once per market and cached.</p>
+</div>
+
+<div class="wf">
+<h3>3 · Decision Card</h3>
+<div class="browser"><div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">localhost:8000/#card</span><span class="status">live</span></div>
+<div class="screen">
+  <div class="g g3">
+    <div class="blk in"><b>Scenario</b><div class="s">current · A · B · C</div></div>
+    <div class="blk in"><b>PNG · PDF · Copy</b><div class="s">PDF can be made by the server</div><span class="ep pill p-api">POST /api/card?format=pdf</span></div>
+    <div class="blk"><b>Data version stamp</b><div class="s">printed on the card: engine v2026-10-08</div><span class="ep pill p-api">/api/meta</span></div>
+  </div>
+  <div class="blk live"><b>Kuwait · Aug 2026 · +20% seats</b><div class="s">confidence badge A · verdict sentence</div><span class="ep pill p-api">POST /api/card</span></div>
+  <div class="g g2"><div class="blk live mid"><b>Expected change + range bar</b></div><div class="blk live mid"><b>Baseline → scenario bars</b></div></div>
+  <div class="g g3"><div class="blk live"><b>Occupancy</b></div><div class="blk live"><b>Per 1,000 seats</b></div><div class="blk live"><b>Holidays</b></div></div>
+  <div class="blk live"><b>What could move the answer most</b><div class="sk w80"></div><div class="sk w60"></div></div>
+</div></div>
+<p class="note">New: every exported card carries the engine's data version, so a printed number can be traced to the exact run that made it.</p>
+</div>
+
+<div class="wf">
+<h3>4 · Evidence Lab</h3>
+<div class="browser"><div class="bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">localhost:8000/#evidence</span><span class="status">live</span></div>
+<div class="screen">
+  <div class="g g3">
+    <div class="blk in"><b>Market</b><div class="s">total or any of 33</div></div>
+    <div class="blk in"><b>Model L0 · L1 · LG · L2</b></div>
+    <div class="blk in"><b>Horizon 1 · 3 · 6</b></div>
+  </div>
+  <div class="g gr">
+    <div class="blk live tall"><b>Actual vs predicted</b><div class="sk"></div><div class="sk w80"></div><div class="sk w60"></div><span class="ep pill p-api">GET /api/evidence?market=KUWAIT&amp;model=L2&amp;h=1</span></div>
+    <div class="g"><div class="blk live"><b>Miss (WAPE)</b></div><div class="blk live"><b>Range coverage</b></div><div class="blk live"><b>Bias by year</b></div></div>
+  </div>
+  <div class="g g2">
+    <div class="blk live mid"><b>Skill bars</b><span class="ep pill p-api">/api/evidence</span></div>
+    <div class="blk live mid"><b>Replay: any market, any cutoff</b><div class="s">new: pick the market and the month to replay from</div><span class="ep pill p-api">GET /api/replay/KUWAIT?cutoff=2023-07</span></div>
+  </div>
+  <div class="g g3"><div class="blk live"><b>β by year</b><span class="ep pill p-api">/api/evidence</span></div><div class="blk live"><b>Placebo</b><span class="ep pill p-api">/api/evidence</span></div><div class="blk live"><b>Nowcast check</b><span class="ep pill p-api">/api/evidence</span></div></div>
+  <div class="blk"><b>Admin · Refit with new data</b><div class="s">upload files → progress: loading · fitting · back-testing · done</div><span class="ep pill p-eng">POST /api/admin/refit</span></div>
+</div></div>
+</div>
+
+<h3>How each block behaves while waiting</h3>
+<div class="states">
+  <div class="st load"><b>Loading</b>The block keeps its last numbers, faded, with a thin progress line. Nothing jumps to zero.</div>
+  <div class="st ok"><b>Updated</b>New numbers count to their value; the status light stays green.</div>
+  <div class="st bad"><b>Engine offline</b>Red light and a banner: "Live engine not reachable. Showing the saved snapshot from 7 Oct 2026." All screens still work.</div>
+</div>
+
+<!-- 4 REQUEST LIFECYCLE -->
+<h2><span class="sec-n">04</span>One click, start to finish</h2>
+<div class="col"><p>Example: on Scenario Studio you set Kuwait, August 2026, seats +20%. The numbers below are the engine's real answers for that case.</p></div>
+<div class="card diagram scroll" style="margin-top:12px">
+<svg viewBox="0 0 980 300" role="img" aria-label="Sequence of one scenario request from the browser through the API to the engine and back">
+  <defs><marker id="ar2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--mut)"/></marker></defs>
+  <g font-size="13.5" font-weight="600" fill="var(--ink)" text-anchor="middle"><text x="130" y="26">Browser</text><text x="490" y="26">aeriva_api</text><text x="850" y="26">aeriva_core</text></g>
+  <g stroke="var(--ln)" stroke-width="2"><path d="M130 38V290"/><path d="M490 38V290"/><path d="M850 38V290"/></g>
+  <g stroke="var(--mut)" stroke-width="1.4" fill="none">
+    <path d="M130 74H488" marker-end="url(#ar2)"/>
+    <path d="M490 132H848" marker-end="url(#ar2)"/>
+    <path d="M850 190H492" marker-end="url(#ar2)"/>
+    <path d="M490 248H132" marker-end="url(#ar2)"/>
+  </g>
+  <g font-size="12.5" fill="var(--ink)">
+    <text x="146" y="64">1 · seats input = 20 → wait 250 ms → POST /api/scenario</text>
+    <text x="506" y="104" fill="var(--mut)">2 · check inputs: market known, month in range</text>
+    <text x="506" y="122">3 · future_row(panel, KUWAIT, 2026-08) → seats_change(pct=20)</text>
+    <text x="506" y="180">4 · Result: delta 10,108 · low 7,211 · high 10,108</text>
+    <text x="146" y="238">5 · JSON in about 50 ms (state already in memory)</text>
+    <text x="146" y="274" fill="var(--mut)">6 · headline, tiles, waterfall, tornado and holidays redraw together</text>
+  </g>
+</svg>
+</div>
+
+<div class="two" style="margin-top:14px">
+<div style="min-width:0"><h3>Request</h3>
+<pre><span class="c">POST /api/scenario</span>
+{
+  <span class="k">"market"</span>: <span class="str">"KUWAIT"</span>,
+  <span class="k">"month"</span>: <span class="str">"2026-08"</span>,
+  <span class="k">"lever"</span>: <span class="str">"pct"</span>,
+  <span class="k">"values"</span>: { <span class="k">"pct"</span>: <span class="n">20</span> },
+  <span class="k">"published_occupancy"</span>: <span class="n">null</span>
+}</pre></div>
+<div style="min-width:0"><h3>Response (shortened)</h3>
+<pre>{
+  <span class="k">"baseline"</span>: { <span class="k">"gn"</span>: <span class="n">80600</span>, <span class="k">"lo80"</span>: <span class="n">59603</span>, <span class="k">"hi80"</span>: <span class="n">115550</span> },
+  <span class="k">"delta"</span>: { <span class="k">"central"</span>: <span class="n">10108</span>, <span class="k">"low"</span>: <span class="n">7211</span>, <span class="k">"high"</span>: <span class="n">10108</span> },
+  <span class="k">"scenario_gn"</span>: <span class="n">90708</span>,
+  <span class="k">"beta"</span>: <span class="n">0.65</span>, <span class="k">"grade"</span>: <span class="str">"A"</span>, <span class="k">"lever_grade"</span>: <span class="str">"GREEN"</span>,
+  <span class="k">"yield_per_1000"</span>: <span class="n">1840</span>,
+  <span class="k">"occupancy"</span>: { <span class="k">"level1_pct"</span>: <span class="n">0.0074</span>, <span class="k">"points"</span>: <span class="n">null</span> },
+  <span class="k">"drivers"</span>: { <span class="k">"growth"</span>: <span class="n">8106</span>, <span class="k">"seats"</span>: <span class="n">0</span>, <span class="k">"ramadan"</span>: <span class="n">0</span>, <span class="k">"eid"</span>: <span class="n">0</span> },
+  <span class="k">"sensitivity"</span>: [ <span class="c">…top 3…</span> ],
+  <span class="k">"holidays"</span>: { <span class="k">"effect"</span>: <span class="n">0</span>, <span class="k">"ramadan_days"</span>: [<span class="n">0</span>, <span class="n">0</span>] },
+  <span class="k">"warnings"</span>: [<span class="str">"seats_assumed_A11"</span>],
+  <span class="k">"data_version"</span>: <span class="str">"2026-10-08"</span>
+}</pre></div>
+</div>
+
+<!-- 5 REFRESH -->
+<h2><span class="sec-n">05</span>Feeding in new data</h2>
+<div class="col">
+<ol class="steps">
+  <li>Copy the new DCT Excel files into <code>data/</code>, same names and columns as today.</li>
+  <li>Open Evidence Lab → <b>Refit with new data</b>, or call <code>POST /api/admin/refit</code>.</li>
+  <li>The server runs the engine steps in order: load and check (<code>integrity_report</code>), build the panel, fit L2, back-test, nowcast, grades. Progress shows in the page.</li>
+  <li>When done, the new state replaces the old one in memory and in <code>cache/</code> with a new data version. The old version is kept, so a bad file can be rolled back.</li>
+  <li>Every screen refreshes; the header shows the new version and date; new months appear in the month lists by themselves.</li>
+</ol>
+<div class="q">If a new file fails the integrity checks (missing columns, duplicates, load factors above 120%), the refit stops before anything is replaced, and the page lists what failed.</div>
+</div>
+
+<!-- 6 CODE LAYOUT -->
+<h2><span class="sec-n">06</span>What gets built</h2>
+<div class="two">
+<div class="card" style="min-width:0"><h3 style="margin-top:0">New folder next to aeriva_core</h3>
+<div class="tree">aeriva_work/
+<span class="d">├─</span> data/            <span class="d"># DCT files (existing)</span>
+<span class="d">├─</span> aeriva_core/     <span class="d"># engine (unchanged)</span>
+<span class="d">└─</span> aeriva_api/      <span class="d"># new</span>
+   <span class="d">├─</span> main.py        <span class="d"># app, CORS, serves the page</span>
+   <span class="d">├─</span> state.py       <span class="d"># load, fit, cache, version</span>
+   <span class="d">├─</span> schemas.py     <span class="d"># request/response shapes</span>
+   <span class="d">├─</span> routes/        <span class="d"># one file per screen</span>
+   <span class="d">├─</span> static/        <span class="d"># simulator HTML + api.js</span>
+   <span class="d">├─</span> cache/         <span class="d"># saved engine state</span>
+   <span class="d">└─</span> tests/         <span class="d"># API returns brief numbers</span></div>
+<p class="note">Start with one command: <code>uvicorn aeriva_api.main:app --reload</code>, then open <code>http://localhost:8000</code>.</p></div>
+<div class="card" style="min-width:0"><h3 style="margin-top:0">Build order</h3>
+<ol class="steps" style="font-size:14px">
+  <li><b>State loader + cache.</b> Load files, fit, back-test once; save to <code>cache/</code>.</li>
+  <li><b><code>/api/meta</code> and <code>/api/radar</code>.</b> Radar works live end to end.</li>
+  <li><b><code>/api/scenario</code> + series.</b> Studio and Decision Card.</li>
+  <li><b><code>/api/evidence</code> + replay.</b> Removes every typed-in figure.</li>
+  <li><b>Offline fallback</b> to today's snapshot, and the status light.</li>
+  <li><b>Tests</b> that the API reproduces the brief: +7,087 for Kuwait Aug 2024 +20%; WAPE 18.5% and total 5.7%.</li>
+  <li><b>Refit</b> endpoint and admin panel.</li>
+</ol></div>
+</div>
+
+<h2><span class="sec-n">07</span>Decisions to make before building</h2>
+<div class="col">
+<div class="q"><b>Server-side PDF or keep the browser export?</b> A server PDF can carry the data version and higher quality; the browser export already works.</div>
+<div class="q"><b>Where the scenario logic lives.</b> Plan: all in Python (<code>scenario.py</code> already has seats %, flights, route cut, new seats and stopover; it gains market mix, the sensitivity runs and the driver split). The page then holds no model maths.</div>
+<div class="q"><b>Hosting later.</b> The same server can move to a host (Render, Railway or a university server) and add the password there. Nothing in the page changes except the address.</div>
+</div>
+
+</div>

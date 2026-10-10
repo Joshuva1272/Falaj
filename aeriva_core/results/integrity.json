@@ -1,0 +1,28 @@
+{
+  "flight_rows": 117589,
+  "flight_rows_removed_by_cleaning": 19,
+  "pax_identity_violations": 0,
+  "share_load_factor_above_1": 0.0841,
+  "transfer_share_of_pax": 0.495,
+  "int_rows": 58622,
+  "int_new_arrivals_gt_guests": 0,
+  "int_duplicates": 0,
+  "dom_rows": 1308,
+  "dom_duplicates": 0,
+  "flight_markets": 33,
+  "hotel_nationalities": 45,
+  "markets_without_flights": [
+    "AUSTRALIA",
+    "BRAZIL",
+    "CZECHIA",
+    "DENMARK",
+    "FINLAND",
+    "MEXICO",
+    "MOROCCO",
+    "NORWAY",
+    "PAKISTAN",
+    "ROMANIA",
+    "SOUTH AFRICA",
+    "SWEDEN"
+  ]
+}
